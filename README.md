@@ -57,7 +57,3 @@ To run this application, you need to have Python installed along with the follow
 Below is an example of how the generated PDF will look:
 
 ![Example Output](Output.png)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
