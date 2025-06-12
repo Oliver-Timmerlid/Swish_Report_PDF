@@ -1,13 +1,6 @@
 # CustomTkinter CSV to PDF Converter
 
-This project is a simple application built using CustomTkinter that allows users to drag and drop a CSV file and convert it to a PDF file. The application provides a user-friendly interface for selecting the output location for the generated PDF.
-
-## Features
-
-- Drag and drop functionality for CSV file input.
-- Button to select the output location for the PDF file.
-- Conversion of CSV data to PDF format.
-- Example output included to showcase the generated PDF layout.
+This project is a simple application built through vibe coding. I had an idea of what i wanted, which was a CustomTkinter app that allows users to drag and drop a CSV file and convert it to a PDF file. 
 
 ## Requirements
 
