@@ -1,45 +1,63 @@
-from tkinter import Tk, filedialog, messagebox
+import sys
+import logging
 import customtkinter as ctk
-from utils.drag_and_drop import DragAndDrop
-from utils.csv_to_pdf import convert_csv_to_pdf
 from tkinterdnd2 import TkinterDnD
 
-class App:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("CSV to PDF Converter")
-        self.root.geometry("400x300")
+# Import core configuration
+from core.config import Config
+from core.logging_config import setup_logging
 
-        self.drag_and_drop = DragAndDrop(self.root, self.on_file_drop)
+# Import UI and controller
+from ui.main_window import MainWindow
+from controllers.main_controller import MainController
 
-        self.label = ctk.CTkLabel(self.root, text="Drag and drop a CSV file here")
-        self.label.pack(pady=20)
 
-        self.convert_button = ctk.CTkButton(self.root, text="Convert to PDF", command=self.convert_to_pdf)
-        self.convert_button.pack(pady=10)
+def main() -> int:
+    """
+    Main application entry point.
+    
+    Initializes logging, creates UI, and starts the application.
+    
+    Returns:
+        int: Exit code (0 for success, 1 for error).
+    """
+    try:
+        # Setup logging first (no print statements allowed per PRD)
+        setup_logging()
+        logger = logging.getLogger(__name__)
+        logger.info("Application starting")
+        
+        # Configure CustomTkinter appearance
+        ctk.set_appearance_mode(Config.APPEARANCE_MODE)
+        # Note: Not using set_default_color_theme() - we use custom theme from ui.theme
+        
+        # Create root window with drag-and-drop support
+        root = TkinterDnD.Tk()
+        
+        # Create main window
+        main_window = MainWindow(root)
+        
+        # Create controller to coordinate UI and services
+        controller = MainController(main_window)
+        
+        logger.info("Application initialized successfully")
+        
+        # Start main loop
+        main_window.run()
+        
+        logger.info("Application shutting down normally")
+        return 0
+        
+    except Exception as e:
+        # Log any startup errors
+        if 'logger' in locals():
+            logger.critical(f"Fatal error during startup: {str(e)}", exc_info=True)
+        else:
+            # Fallback if logging not yet configured
+            print(f"FATAL ERROR: {str(e)}")
+        
+        return 1
 
-        self.csv_file_path = None
-
-    def on_file_drop(self, file_path):
-        self.csv_file_path = file_path
-        self.label.configure(text=f"Selected file: {file_path}")
-
-    def convert_to_pdf(self):
-        if not self.csv_file_path:
-            messagebox.showerror("Error", "Please drop a CSV file first.")
-            return
-
-        pdf_file_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
-        if pdf_file_path:
-            try:
-                convert_csv_to_pdf(self.csv_file_path, pdf_file_path)
-                messagebox.showinfo("Success", "PDF file created successfully!")
-            except Exception as e:
-                messagebox.showerror("Error", f"Failed to convert CSV to PDF: {e}")
 
 if __name__ == "__main__":
-    ctk.set_appearance_mode("light")
-    ctk.set_default_color_theme("blue")
-    root = TkinterDnD.Tk()  # Use TkinterDnD.Tk for drag-and-drop support
-    app = App(root)
-    root.mainloop()
+    sys.exit(main())
